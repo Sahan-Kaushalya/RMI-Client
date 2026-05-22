@@ -1,5 +1,7 @@
 package lk.kaushalya.bcd;
 
+import lk.kaushalya.bcd.client.Message;
+
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
@@ -14,7 +16,7 @@ public class RMIClient {
             }
 
             Message message = (Message) registry.lookup("message_service");
-            message.send();
+            System.out.println( message.send());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
