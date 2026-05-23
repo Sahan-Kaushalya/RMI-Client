@@ -5,37 +5,56 @@ import lk.kaushalya.bcd.client.UserService;
 import lk.kaushalya.bcd.model.Data;
 import lk.kaushalya.bcd.model.User;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Properties;
 
 public class RMIClient {
     public static void main(String[] args) {
         try {
-            Registry registry = LocateRegistry.getRegistry("localhost",6666);
-            String[] list = registry.list();
+//            Registry registry = LocateRegistry.getRegistry("localhost",6666);
+//            String[] list = registry.list();
+//
+//            for (String s:list){
+//                System.out.println(s);
+//            }
 
-            for (String s:list){
-                System.out.println(s);
-            }
+//            Message message = (Message) registry.lookup("message_service");
+//            System.out.println( "\n=============================\n"+message.send());
 
-            Message message = (Message) registry.lookup("message_service");
-            System.out.println( "\n=============================\n"+message.send());
+//            Data data = message.getData();
+//
+//            System.out.println("\n");
+//            System.out.println("=============================");
+//            System.out.println(data.getId());
+//            System.out.println(data.getName());
+//            System.out.println(data.getRole());
+//            System.out.println("=============================");
+//
+//            System.out.println(message.getResult(10,20));
+//            System.out.println(message.getResult(200,10));
+//            System.out.println("=============================");
 
-            Data data = message.getData();
+            /// lookup user_service using {@link java.rmi.registry.LocateRegistry}
+//            UserService userService =(UserService) registry.lookup("user_service");
 
-            System.out.println("\n");
-            System.out.println("=============================");
-            System.out.println(data.getId());
-            System.out.println(data.getName());
-            System.out.println(data.getRole());
-            System.out.println("=============================");
+            /// lookup user_service using {@link java.rmi.Naming}
+            ///  url : rmi://<host>:<port>/<service_name>
+            ///  localhost url : rmi://127.0.0.1:6666/user_service
+            ///  localhost url : //127.0.0.1:6666/user_service
 
-            System.out.println(message.getResult(10,20));
-            System.out.println(message.getResult(200,10));
-            System.out.println("=============================");
+//            UserService userService = (UserService) java.rmi.Naming.lookup("rmi://localhost:6666/user_service");
+          //  UserService userService = (UserService) java.rmi.Naming.lookup("tcp:// 127.0.0.1:6666/user_service");
 
-            /// lookup user_service
-            UserService userService =(UserService) registry.lookup("user_service");
+            /// lookup user_service using {@link javax.naming.InitialContext}
+            Properties properties = new Properties();
+            properties.put(Context.PROVIDER_URL,"rmi://127.0.0.1:6666");
+            properties.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.rmi.registry.RegistryContextFactory");
+
+            InitialContext ic = new InitialContext(properties);
+            UserService userService = (UserService) ic.lookup("user_service");
 
             ///  New Users data
             User user = new User(1,"Sahan Kaushalya","sahan@gmail.com",23,"Developer");
@@ -50,6 +69,7 @@ public class RMIClient {
             System.out.println(userService.addUser(user2));
             System.out.println(userService.addUser(user3));
             System.out.println(userService.addUser(user4));
+
             System.out.println("=============================");
             userService.getAllUsers().forEach(u->{
                 System.out.println(u.getId()+","+u.getName());
@@ -62,12 +82,14 @@ public class RMIClient {
             System.out.println(findUser.getName());
             System.out.println(findUser.getEmail());
             System.out.println(findUser.getRole());
+
             System.out.println("=============================");
             findUser = userService.getUserByID(5);
             System.out.println(findUser.getName());
             System.out.println(findUser.getEmail());
             System.out.println(findUser.getRole());
             System.out.println("=============================");
+
             User update = new User(5,"yohan silva","yohansi@gmail.com",23,"Developer");
             System.out.println(userService.updateUser(update));
 
@@ -77,6 +99,7 @@ public class RMIClient {
             System.out.println(findUser.getRole());
             System.out.println("=============================");
             System.out.println(userService.deleteUser(4));
+
             System.out.println("=============================");
             userService.getAllUsers().forEach(u->{
                 System.out.println(u.getId()+","+u.getName());
